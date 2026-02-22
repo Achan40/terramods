@@ -32,11 +32,13 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.5
+
       
       - name: Install Terragrunt
         uses: gruntwork-io/terragrunt-action@v3
         with:
             tg_version: '0.99.4'
+            tofu_version: '1.11.5'
 
       - name: Run Terratest
         run: |
