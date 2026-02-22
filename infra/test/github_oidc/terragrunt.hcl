@@ -4,9 +4,9 @@ include "common" {
 }
 
 terraform {
-  source = "../../../modules/oidc"
+  source = "../../../modules/github_oidc"
 }
 
+# Inputs for tests handled in go module
 inputs = {
-  github_repo = "Achan40/terramods"
 }

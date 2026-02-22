@@ -12,13 +12,23 @@ import (
 
 func TestGithubOIDCProvider(t *testing.T) {
 	// Test oidc provider is created
+	// DO NOT run this test in CI/CD, there can be only one oidc_provider_arn per provider url.
+	// run go with -short flag to skip
+
+	if testing.Short() {
+		t.Skip("Skipping OIDC test in short mode.")
+	}
+
+	// Running in pipeline will delete the creditials that is needed to run the pipeline...
 	t.Parallel()
 
 	terraformOptions := &terraform.Options{
-		TerraformDir:    "../infra/test/oidc",
+		TerraformDir:    "../infra/test/github_oidc",
 		TerraformBinary: "terragrunt",
 		Vars: map[string]interface{}{
-			"github_repo": "Achan40/terramods",
+			"ci_cd_role_name":   "ci_cd_role_test",
+			"ci_cd_policy_name": "ci_cd_policy_test",
+			"github_repo":       "Achan40/terramods",
 		},
 	}
 

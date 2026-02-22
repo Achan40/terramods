@@ -17,7 +17,7 @@ resource "aws_iam_openid_connect_provider" "github_oidc" {
 
 # set up iam role for github actions to use
 resource "aws_iam_role" "ci_cd_role" {
-  name = "ci-cd-role"
+  name = var.ci_cd_role_name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -44,7 +44,7 @@ resource "aws_iam_role" "ci_cd_role" {
 
 # set up policy to get iam role permissions to use certain aws services
 resource "aws_iam_policy" "ci_cd_policy" {
-  name        = "ci-cd-policy"
+  name        = var.ci_cd_policy_name
   description = "Policy for GitHub Actions to provision AWS resources"
 
   policy = jsonencode({
