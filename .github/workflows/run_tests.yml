@@ -1,0 +1,45 @@
+name: Run tests
+
+on: 
+  push:
+    branches:
+      - dev
+permissions:
+  id-token: write   # Required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: us-east-2
+          role-to-assume: ${{ secrets.CI_CD_ROLE_ARN }}
+    
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+            go-version: '1.26'
+    
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.5
+      
+      - name: Install Terragrunt
+        uses: gruntwork-io/terragrunt-action@v3
+        with:
+            tg_version: '0.99.4'
+
+      - name: Run Terratest
+        run: |
+          cd test/        
+          go mod tidy
+          go test -v ./...           
