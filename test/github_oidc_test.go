@@ -19,7 +19,7 @@ func TestGithubOIDCProvider(t *testing.T) {
 		t.Skip("Skipping OIDC test in short mode.")
 	}
 
-	// Running in pipeline will delete the creditials that is needed to run the pipeline...
+	// Running test in pipeline will delete the creditials that is needed to run the pipeline...
 	t.Parallel()
 
 	terraformOptions := &terraform.Options{
