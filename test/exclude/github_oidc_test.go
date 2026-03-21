@@ -23,7 +23,7 @@ func TestGithubOIDCProvider(t *testing.T) {
 	t.Parallel()
 
 	terraformOptions := &terraform.Options{
-		TerraformDir:    "../infra/test/github_oidc",
+		TerraformDir:    "../../infra/test/github_oidc",
 		TerraformBinary: "terragrunt",
 		Vars: map[string]interface{}{
 			"ci_cd_role_name":   "ci_cd_role_test",
@@ -44,6 +44,7 @@ func TestGithubOIDCProvider(t *testing.T) {
 
 	client := iam.NewFromConfig(cfg)
 
+	// Get OIDC provider details
 	resp, err := client.GetOpenIDConnectProvider(context.TODO(), &iam.GetOpenIDConnectProviderInput{
 		OpenIDConnectProviderArn: &oidcArn,
 	})

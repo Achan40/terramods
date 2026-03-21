@@ -19,7 +19,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.name}-public-${each.key}"
+    Name = "${var.vpc_name}-public-${each.key}"
     Tier = "Public"
   }
 }
@@ -32,7 +32,7 @@ resource "aws_subnet" "private" {
   availability_zone = each.key
 
   tags = {
-    Name = "${var.name}-private-${each.key}"
+    Name = "${var.vpc_name}-private-${each.key}"
     Tier = "Private"
   }
 }
