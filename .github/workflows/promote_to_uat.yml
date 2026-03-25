@@ -1,0 +1,32 @@
+name: Promote to uat
+
+on:
+  workflow_run:
+    workflows: ["Run unit tests"]
+    branches: [dev]
+    types:
+      - completed
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  promote-to-uat:
+    runs-on: ubuntu-latest
+    environment: uat
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Merge dev into UAT
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout uat
+          git merge origin/dev --ff-only
+          git push origin uat
