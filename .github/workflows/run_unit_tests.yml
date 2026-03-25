@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  run-unit-tests:
     runs-on: ubuntu-latest
     environment: dev
 
@@ -30,7 +30,7 @@ jobs:
             go-version: '1.26'
     
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.14.5
 
@@ -45,4 +45,23 @@ jobs:
         run: |
           cd test/unit/        
           go mod tidy
-          go test -short 
+          go test -short
+
+  promote-to-uat:
+    needs: run-unit-tests
+    runs-on: ubuntu-latest
+    environment: uat
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Merge dev into UAT
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout uat
+          git merge origin/dev --ff-only
+          git push origin uat
