@@ -7,7 +7,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.igw.id
   }
 
-  tags = { Name = "${var.name}-public-rt" }
+  tags = { Name = "${var.vpc_name}-public-rt" }
 }
 
 resource "aws_route_table_association" "public_assoc" {
@@ -26,7 +26,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.nat[each.key].id  # explicit lookup by AZ
   }
 
-  tags = { Name = "${var.name}-private-rt-${each.key}" }
+  tags = { Name = "${var.vpc_name}-private-rt-${each.key}" }
 }
 
 resource "aws_route_table_association" "private_assoc" {

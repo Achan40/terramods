@@ -1,3 +1,15 @@
+# Calculations for subnet CIDR blocks based on the VPC CIDR and availability zones
+locals {
+  public_subnet_cidrs = {
+    for idx, az in var.availability_zones :
+    az => cidrsubnet(var.vpc_cidr, 8, idx)
+  }
+  private_subnet_cidrs = {
+    for idx, az in var.availability_zones :
+    az => cidrsubnet(var.vpc_cidr, 8, idx + 10)
+  }
+}
+
 resource "aws_subnet" "public" {
   for_each = local.public_subnet_cidrs
 
@@ -7,7 +19,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.name}-public-${each.key}"
+    Name = "${var.vpc_name}-public-${each.key}"
     Tier = "Public"
   }
 }
@@ -20,7 +32,7 @@ resource "aws_subnet" "private" {
   availability_zone = each.key
 
   tags = {
-    Name = "${var.name}-private-${each.key}"
+    Name = "${var.vpc_name}-private-${each.key}"
     Tier = "Private"
   }
 }

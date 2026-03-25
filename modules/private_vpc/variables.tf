@@ -1,6 +1,6 @@
-variable "name" {
+variable "vpc_name" {
   type        = string
-  description = "Name for resources"
+  description = "Name for VPC"
 }
 
 variable "region" {
