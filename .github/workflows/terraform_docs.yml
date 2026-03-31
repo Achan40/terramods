@@ -1,9 +1,9 @@
 name: Validate Terraform Docs
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - dev
     paths:
       - 'modules/**'   # only trigger when modules/ files change
 
@@ -48,7 +48,6 @@ jobs:
         with:
           working-dir: modules   # modules folder
           recursive: true
-          recursive-path: modules  # scan all subdirs under modules/
           output-file: README.md
           output-method: inject
           config-file: ../.terraform-docs.yml # path relative to modules/
