@@ -10,6 +10,7 @@ on:
 jobs:
   check-readme-exists:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v6
