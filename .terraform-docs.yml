@@ -13,17 +13,12 @@ output:
     <!-- END_TF_DOCS -->
 
 content: |-
-  ## Overview
   {{ .Header }}
 
-  ## Requirements
   {{ .Requirements }}
 
-  ## Providers
   {{ .Providers }}
 
-  ## Inputs
   {{ .Inputs }}
 
-  ## Outputs
   {{ .Outputs }}

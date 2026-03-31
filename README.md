@@ -25,16 +25,16 @@ Brief description of what the module does.
 
 ```
 
-Then run terraform-docs locally to populate it:
+Then run terraform-docs locally in the repo root to populate it:
 ```bash
-terraform-docs --config .terraform-docs.yml modules/
+make docs
 ```
 
 # Updating Modules
 
-After making any changes to a module, regenerate the module documentation before opening a PR:
+After making any changes to a module, regenerate the module documentation from the repo root before opening a PR:
 ```bash
-terraform-docs --config .terraform-docs.yml modules/
+make docs
 ```
 
 The CI pipeline will fail if the README.md is out of date.
