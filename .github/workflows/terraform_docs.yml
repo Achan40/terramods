@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'modules/**'   # only trigger when module files change
+      - 'modules/**'   # only trigger when modules/ files change
 
 jobs:
   check-readme-exists:
@@ -35,6 +35,7 @@ jobs:
           exit $failed
 
   validate-docs:
+    needs: check-readme-exists
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,11 +46,11 @@ jobs:
       - name: Validate docs are up to date
         uses: terraform-docs/gh-actions@v1.4.1
         with:
-          working-dir: .   # root of the repo
+          working-dir: modules   # modules folder
           recursive: true
           recursive-path: modules  # scan all subdirs under modules/
           output-file: README.md
           output-method: inject
-          config-file: .terraform-docs.yml
+          config-file: ../.terraform-docs.yml # path relative to modules/
           git-push: false
           fail-on-diff: true  # fails if README.md doesn't match generated output
