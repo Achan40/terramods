@@ -1,16 +1,13 @@
 name: Validate Terraform Docs
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
-    paths:
-      - 'modules/**'   # only trigger when modules/ files change
+      - dev_workflow
 
 jobs:
   check-readme-exists:
     runs-on: ubuntu-latest
-    environment: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v6
