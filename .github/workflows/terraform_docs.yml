@@ -45,7 +45,6 @@ jobs:
         with:
           working-dir: modules   # modules folder
           recursive: true
-          recursive-path: .  # scan all subdirs under modules/
           output-file: README.md
           output-method: inject
           config-file: ../.terraform-docs.yml # path relative to modules/
