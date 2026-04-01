@@ -1,5 +1,5 @@
 # Modules
-Placeholder. Required since terraform-docs github actions runs recursively and in the specified working directory folder root.  
+Placeholder. Required since terraform-docs github actions runs recursively and in the specified working directory folder root.
 
 <!-- BEGIN_TF_DOCS -->
 
