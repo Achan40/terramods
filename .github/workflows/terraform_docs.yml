@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'modules/**'   # only trigger when modules/ files change
+      - 'modules/**'
 
 jobs:
   check-readme-exists:
