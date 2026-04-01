@@ -11,7 +11,7 @@ Testing
 Terragrunt
 * On first run: `terragrunt apply --all --backend-bootstrap` to create the s3 remote backend if remote_state is referenced.
 
-## Adding a New Module
+# Adding a New Module
 
 When adding a new module, make sure to create a `README.md` with the
 following template before opening a PR:

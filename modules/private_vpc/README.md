@@ -1,6 +1,6 @@
 # private_vpc
 
-Create the infrastructure for a completely private vpc. 
+Create the infrastructure for a completely private vpc. 1
 
 <!-- BEGIN_TF_DOCS -->
 

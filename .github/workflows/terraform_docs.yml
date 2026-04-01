@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'modules/**'   # only trigger when modules/ files change
+      - 'modules/**'
 
 jobs:
   check-readme-exists:
@@ -48,7 +48,7 @@ jobs:
         with:
           working-dir: modules   # modules folder
           recursive: true
-          recursive-path: modules  # scan all subdirs under modules/
+          recursive-path: .  # scan all subdirs under modules/
           output-file: README.md
           output-method: inject
           config-file: ../.terraform-docs.yml # path relative to modules/
