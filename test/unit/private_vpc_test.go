@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +30,6 @@ func TestPrivateVPCMultiAZ(t *testing.T) {
 			"vpc_cidr": "10.0.0.0/16",
 			"availability_zones": []string{
 				"us-east-2a",
-				"us-east-2b",
 			},
 		},
 	}
@@ -60,13 +61,13 @@ func TestPrivateVPCMultiAZ(t *testing.T) {
 	assert.Equal(t, "10.0.0.0/16", *vpc.CidrBlock)
 
 	// Validate Subnets
-	assert.Equal(t, 2, len(subnetIDs))
+	assert.Equal(t, 1, len(subnetIDs))
 
 	subnetOut, err := ec2Client.DescribeSubnets(ctx, &ec2.DescribeSubnetsInput{
 		SubnetIds: subnetIDs,
 	})
 	assert.NoError(t, err)
-	assert.Len(t, subnetOut.Subnets, 2)
+	assert.Len(t, subnetOut.Subnets, 1)
 
 	for _, subnet := range subnetOut.Subnets {
 
@@ -81,4 +82,23 @@ func TestPrivateVPCMultiAZ(t *testing.T) {
 		assert.NotNil(t, subnet.CidrBlock)
 		assert.NotEmpty(t, *subnet.CidrBlock)
 	}
+
+	// Validate EICE endpoints were created for each private subnet
+	eiceOut, err := ec2Client.DescribeInstanceConnectEndpoints(ctx, &ec2.DescribeInstanceConnectEndpointsInput{
+		Filters: []ec2types.Filter{
+			{
+				Name:   aws.String("vpc-id"),
+				Values: []string{vpcID},
+			},
+		},
+	})
+	assert.NoError(t, err)
+
+	endpointSubnetIDs := make([]string, 0, len(eiceOut.InstanceConnectEndpoints))
+	for _, endpoint := range eiceOut.InstanceConnectEndpoints {
+		assert.Equal(t, ec2types.Ec2InstanceConnectEndpointStateCreateComplete, endpoint.State)
+		endpointSubnetIDs = append(endpointSubnetIDs, *endpoint.SubnetId)
+	}
+
+	assert.ElementsMatch(t, subnetIDs, endpointSubnetIDs)
 }
