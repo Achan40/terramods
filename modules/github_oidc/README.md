@@ -1,6 +1,6 @@
 # github_oidc
 
-Create the github odic provider so that CI/CD works correctly.
+Create the github odic provider so that CI/CD works correctly. The terratest for this module should not be run in CI pipeline as only one oidc provider is allowed.
 
 <!-- BEGIN_TF_DOCS -->
 
