@@ -24,14 +24,31 @@ variable "vpc_id" {
   description = "ID of the VPC to deploy the instance into."
 }
 
-variable "subnet_id" {
-  type        = string
-  description = "ID of the subnet to deploy the instance into."
+variable "subnet_ids" {
+  type        = list(string)
+  description = "List of subnet IDs to deploy instances into. Instances are distributed across subnets in round-robin order."
+}
+
+variable "instance_count" {
+  type        = number
+  description = "Number of EC2 instances to deploy."
+  default     = 1
 }
 
 variable "eice_security_group_id" {
   type        = string
   description = "ID of the EC2 Instance Connect Endpoint security group to allow SSH ingress from"
+}
+
+variable "iam_instance_profile_name" {
+  type        = string
+  description = "Name of the IAM instance profile to attach to the instance"
+}
+
+variable "additional_security_group_ids" {
+  type        = list(string)
+  description = "Additional security group IDs to attach to the instance (e.g. a shared cluster SG)"
+  default     = []
 }
 
 variable "tags" {

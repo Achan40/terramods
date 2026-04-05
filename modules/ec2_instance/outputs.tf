@@ -1,19 +1,14 @@
-output "instance_id" {
-  description = "ID of the EC2 instance"
-  value       = aws_instance.main.id
+output "instance_ids" {
+  description = "IDs of the EC2 instances"
+  value       = aws_instance.main[*].id
 }
 
-output "private_ip" {
-  description = "Private IP address of the EC2 instance"
-  value       = aws_instance.main.private_ip
-}
-
-output "public_ip" {
-  description = "Public IP address of the EC2 instance (if assigned)"
-  value       = aws_instance.main.public_ip
+output "private_ips" {
+  description = "Private IP addresses of the EC2 instances"
+  value       = aws_instance.main[*].private_ip
 }
 
 output "security_group_id" {
-  description = "ID of the instance security group"
+  description = "ID of the shared instance security group"
   value       = aws_security_group.instance.id
 }

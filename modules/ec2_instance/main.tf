@@ -18,6 +18,7 @@ resource "aws_security_group" "instance" {
   description = "Security group for ${var.instance_name}"
   vpc_id      = var.vpc_id
 
+  # only allow SSH from the EICE security group
   ingress {
     from_port       = 22
     to_port         = 22
@@ -25,6 +26,7 @@ resource "aws_security_group" "instance" {
     security_groups = [var.eice_security_group_id]
   }
 
+  # allows all outbound traffic
   egress {
     from_port   = 0
     to_port     = 0
@@ -36,11 +38,13 @@ resource "aws_security_group" "instance" {
 }
 
 resource "aws_instance" "main" {
+  count = var.instance_count
+
   ami                    = var.ami_id
   instance_type          = var.instance_type
-  subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.instance.id]
-  iam_instance_profile   = aws_iam_instance_profile.instance.name
+  subnet_id              = var.subnet_ids[count.index % length(var.subnet_ids)]
+  vpc_security_group_ids = concat([aws_security_group.instance.id], var.additional_security_group_ids)
+  iam_instance_profile   = var.iam_instance_profile_name
 
   user_data = <<-EOF
     #!/bin/bash
@@ -48,5 +52,5 @@ resource "aws_instance" "main" {
     apt-get install -y ec2-instance-connect
   EOF
 
-  tags = merge(var.tags, { Name = var.instance_name })
+  tags = merge(var.tags, { Name = "${var.instance_name}-${count.index + 1}" })
 }

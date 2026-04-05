@@ -2,9 +2,7 @@ package test
 
 import (
 	"context"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -17,21 +15,9 @@ import (
 func TestPrivateVPCMultiAZ(t *testing.T) {
 	t.Parallel()
 
-	region := "us-east-2"
-
-	uniqueID := fmt.Sprintf("%d", time.Now().Unix())
-
 	terraformOptions := &terraform.Options{
-		TerraformDir:    "../../infra/test/private_vpc",
+		TerraformDir:    "../../examples/units/private_vpc",
 		TerraformBinary: "terragrunt",
-		Vars: map[string]interface{}{
-			"vpc_name": "test-private-vpc-" + uniqueID,
-			"region":   region,
-			"vpc_cidr": "10.0.0.0/16",
-			"availability_zones": []string{
-				"us-east-2a",
-			},
-		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -39,6 +25,8 @@ func TestPrivateVPCMultiAZ(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Terraform Outputs
+	region := terraform.Output(t, terraformOptions, "region")
+	vpcCIDR := terraform.Output(t, terraformOptions, "vpc_cidr")
 	vpcID := terraform.Output(t, terraformOptions, "vpc_id")
 	subnetIDs := terraform.OutputList(t, terraformOptions, "private_subnet_ids")
 
@@ -58,7 +46,7 @@ func TestPrivateVPCMultiAZ(t *testing.T) {
 	assert.Len(t, vpcOut.Vpcs, 1)
 
 	vpc := vpcOut.Vpcs[0]
-	assert.Equal(t, "10.0.0.0/16", *vpc.CidrBlock)
+	assert.Equal(t, vpcCIDR, *vpc.CidrBlock)
 
 	// Validate Subnets
 	assert.Equal(t, 1, len(subnetIDs))
