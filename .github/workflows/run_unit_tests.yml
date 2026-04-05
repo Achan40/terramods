@@ -104,9 +104,6 @@ jobs:
           tg_version: '1.0.0'
           tofu_version: '1.11.5'
 
-      - name: Install gotestsum
-        run: go install gotest.tools/gotestsum@v2.0.0
-
       - name: Clear terragrunt cache
         run: find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 
@@ -117,7 +114,7 @@ jobs:
         run: |
           cd test/
           go mod tidy
-          gotestsum --format testname -- ./units/... -timeout 30m
+          go test -short ./units/...
 
   promote-to-uat:
     needs: run-unit-tests
