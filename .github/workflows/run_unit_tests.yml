@@ -43,7 +43,7 @@ jobs:
 
       - name: Run Terratest
         run: |
-          cd test/unit/        
+          cd test/units/        
           go mod tidy
           go test -short
 

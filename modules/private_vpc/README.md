@@ -30,7 +30,10 @@ Create the infrastructure for a completely private vpc. 1
 
 | Name | Description |
 |------|-------------|
+| <a name="output_eice_security_group_id"></a> [eice\_security\_group\_id](#output\_eice\_security\_group\_id) | ID of the EC2 Instance Connect Endpoint security group |
 | <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | Ids of the private subnets within the VPC |
 | <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | Ids of the public subnets within the VPC |
+| <a name="output_region"></a> [region](#output\_region) | AWS region the VPC was deployed into |
+| <a name="output_vpc_cidr"></a> [vpc\_cidr](#output\_vpc\_cidr) | CIDR block of the VPC |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | Id of the VPC |
 <!-- END_TF_DOCS -->
