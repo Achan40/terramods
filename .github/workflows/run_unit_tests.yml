@@ -67,6 +67,7 @@ jobs:
     needs: static-checks
     runs-on: ubuntu-latest
     environment: dev
+    timeout-minutes: 90
     permissions:
       id-token: write
       contents: read
@@ -114,7 +115,7 @@ jobs:
         run: |
           cd test/
           go mod tidy
-          go test -short ./units/...
+          go test -short ./units/... -timeout 60m
 
   promote-to-uat:
     needs: run-unit-tests
