@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,12 +16,19 @@ import (
 // TestEC2InstanceCustomVPC deploys an EC2 instance into a subnet within a
 // custom VPC, and validates that the instance is associated with that VPC.
 func TestEC2InstanceCustomVPC(t *testing.T) {
-	t.Parallel()
+
+	uniqueID := random.UniqueId()
 
 	// Step 1: deploy a VPC to use as the target
 	vpcOptions := &terraform.Options{
 		TerraformDir:    "../../examples/units/private_vpc",
 		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"vpc_name":           "test-vpc-" + uniqueID,
+			"region":             "us-east-2",
+			"vpc_cidr":           "10.0.0.0/16",
+			"availability_zones": []string{"us-east-2a"},
+		},
 	}
 
 	defer terraform.Destroy(t, vpcOptions)
@@ -28,12 +36,18 @@ func TestEC2InstanceCustomVPC(t *testing.T) {
 
 	vpcID := terraform.Output(t, vpcOptions, "vpc_id")
 	subnetIDs := terraform.OutputList(t, vpcOptions, "private_subnet_ids")
+	eiceSGID := terraform.Output(t, vpcOptions, "eice_security_group_id")
+	region := terraform.Output(t, vpcOptions, "region")
 	require.NotEmpty(t, subnetIDs)
 
 	// Step 2: deploy IAM instance role
 	iamOptions := &terraform.Options{
 		TerraformDir:    "../../examples/units/iam_instance_role",
 		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"region":    region,
+			"role_name": "test-instance-" + uniqueID,
+		},
 	}
 
 	defer terraform.Destroy(t, iamOptions)
@@ -45,6 +59,11 @@ func TestEC2InstanceCustomVPC(t *testing.T) {
 	sgOptions := &terraform.Options{
 		TerraformDir:    "../../examples/units/instance_security_group",
 		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"region": region,
+			"name":   "test-cluster-" + uniqueID,
+			"vpc_id": vpcID,
+		},
 	}
 
 	defer terraform.Destroy(t, sgOptions)
@@ -52,10 +71,22 @@ func TestEC2InstanceCustomVPC(t *testing.T) {
 
 	clusterSGID := terraform.Output(t, sgOptions, "security_group_id")
 
-	// Step 4: deploy EC2 into the first private subnet of the VPC
+	// Step 4: deploy EC2 into the VPC
 	ec2Options := &terraform.Options{
 		TerraformDir:    "../../examples/units/ec2_instance",
 		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"region":                        region,
+			"instance_name":                 "test-ec2-" + uniqueID,
+			"ami_id":                        "ami-0900fe555666598a2",
+			"instance_type":                 "t3.micro",
+			"instance_count":                1,
+			"vpc_id":                        vpcID,
+			"subnet_ids":                    subnetIDs,
+			"eice_security_group_id":        eiceSGID,
+			"iam_instance_profile_name":     instanceProfileName,
+			"additional_security_group_ids": []string{clusterSGID},
+		},
 	}
 
 	defer terraform.Destroy(t, ec2Options)
@@ -65,7 +96,7 @@ func TestEC2InstanceCustomVPC(t *testing.T) {
 	require.Len(t, instanceIDs, 1)
 
 	ctx := context.Background()
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("us-east-2"))
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
 	require.NoError(t, err)
 
 	ec2Client := ec2.NewFromConfig(cfg)

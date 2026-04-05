@@ -38,14 +38,20 @@ jobs:
       - name: Install Terragrunt
         uses: gruntwork-io/terragrunt-action@v3
         with:
-            tg_version: '0.99.4'
+            tg_version: '1.0.0'
             tofu_version: '1.11.5'
 
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+
       - name: Run Terratest
+        env:
+          TERRAGRUNT_LOG_LEVEL: error
+          TF_LOG: ERROR
         run: |
-          cd test/units/        
+          cd test/units/
           go mod tidy
-          go test -short
+          gotestsum --format testname -- -short -timeout 30m
 
   promote-to-uat:
     needs: run-unit-tests

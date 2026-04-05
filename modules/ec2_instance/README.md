@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-Create any number of EC2 instances. If an n number of EC2 machines are specified, they are deployed on the defined VPC subnets round-robin style.
+Deploy any number of EC2 machines to a vpc. Accessed via EICE or by tailscale once linked.
 
 ## Requirements
 

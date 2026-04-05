@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-Create IAM role. Just a placeholder role for now.
+
 
 ## Requirements
 

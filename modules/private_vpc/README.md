@@ -1,6 +1,6 @@
 # private_vpc
 
-Create the infrastructure for a completely private vpc. 1
+Create the infrastructure for a completely private vpc. Also creates EICE endpoints per az.
 
 <!-- BEGIN_TF_DOCS -->
 

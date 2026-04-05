@@ -76,8 +76,13 @@ resource "aws_iam_policy" "ci_cd_policy" {
         Effect   = "Allow"
         Action   = [
           "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:TagRole",
+          "iam:UntagRole",
           "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
           "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
           "iam:PassRole",
           "iam:GetRole",
           "iam:ListRolePolicies",
@@ -85,11 +90,23 @@ resource "aws_iam_policy" "ci_cd_policy" {
           "iam:CreateInstanceProfile",
           "iam:AddRoleToInstanceProfile",
           "iam:GetInstanceProfile",
+          "iam:ListInstanceProfilesForRole",
           "iam:RemoveRoleFromInstanceProfile",
           "iam:DeleteInstanceProfile",
-          "iam:UpdateAssumeRolePolicy" 
+          "iam:UpdateAssumeRolePolicy"
         ]
         Resource = "*"
+      },
+      # DynamoDB state locking
+      {
+        Effect   = "Allow"
+        Action   = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:DescribeTable"
+        ]
+        Resource = "arn:aws:dynamodb:*:*:table/tflock-table"
       },
       # SSM
       {

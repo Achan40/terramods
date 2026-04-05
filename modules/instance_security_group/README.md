@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-Create security group to allow all access to other resources on the same sg. 
+
 
 ## Requirements
 

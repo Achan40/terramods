@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,9 +16,17 @@ import (
 func TestPrivateVPCMultiAZ(t *testing.T) {
 	t.Parallel()
 
+	uniqueID := random.UniqueId()
+
 	terraformOptions := &terraform.Options{
 		TerraformDir:    "../../examples/units/private_vpc",
 		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"vpc_name":           "test-vpc-" + uniqueID,
+			"region":             "us-east-2",
+			"vpc_cidr":           "10.0.0.0/16",
+			"availability_zones": []string{"us-east-2b"},
+		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)

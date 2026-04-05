@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,9 +15,15 @@ import (
 func TestIAMInstanceRole(t *testing.T) {
 	t.Parallel()
 
+	uniqueID := random.UniqueId()
+
 	terraformOptions := &terraform.Options{
 		TerraformDir:    "../../examples/units/iam_instance_role",
 		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"region":    "us-east-2",
+			"role_name": "test-instance-" + uniqueID,
+		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)

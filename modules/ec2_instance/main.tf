@@ -50,6 +50,7 @@ resource "aws_instance" "main" {
     #!/bin/bash
     apt-get update -y
     apt-get install -y ec2-instance-connect
+    curl -fsSL https://tailscale.com/install.sh | sh
   EOF
 
   tags = merge(var.tags, { Name = "${var.instance_name}-${count.index + 1}" })
