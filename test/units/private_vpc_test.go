@@ -14,7 +14,6 @@ import (
 )
 
 func TestPrivateVPCMultiAZ(t *testing.T) {
-	t.Parallel()
 
 	uniqueID := random.UniqueId()
 
