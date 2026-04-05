@@ -13,7 +13,6 @@ import (
 )
 
 func TestIAMInstanceRole(t *testing.T) {
-	t.Parallel()
 
 	uniqueID := random.UniqueId()
 

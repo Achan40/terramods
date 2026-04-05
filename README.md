@@ -38,3 +38,7 @@ make docs
 ```
 
 The CI pipeline will fail if the README.md is out of date.
+
+# References
+https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example
+https://github.com/gruntwork-io/terragrunt-infrastructure-live-stacks-example

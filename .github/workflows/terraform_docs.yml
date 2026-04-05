@@ -4,11 +4,15 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'modules/**'
 
 jobs:
   check-readme-exists:
     runs-on: ubuntu-latest
-    environment: prod
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -16,7 +20,7 @@ jobs:
       - name: Check every module has a README.md with doc markers
         run: |
           failed=0
-          find modules -mindepth 1 -maxdepth 1 -type d | while read module; do
+          while read -r module; do
             if [ ! -f "$module/README.md" ]; then
               echo "Missing README.md in $module"
               failed=1
@@ -29,12 +33,14 @@ jobs:
             else
               echo "$module/README.md looks good"
             fi
-          done
+          done < <(find modules -mindepth 1 -maxdepth 1 -type d)
           exit $failed
 
   validate-docs:
-    needs: check-readme-exists
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -44,11 +50,11 @@ jobs:
       - name: Validate docs are up to date
         uses: terraform-docs/gh-actions@v1.4.1
         with:
-          working-dir: modules   # modules folder
+          working-dir: modules
           recursive: true
-          recursive-path: .  # scan all subdirs under modules/
+          recursive-path: .
           output-file: README.md
           output-method: inject
-          config-file: ../.terraform-docs.yml # path relative to modules/
+          config-file: ../.terraform-docs.yml
           git-push: false
-          fail-on-diff: true  # fails if README.md doesn't match generated output
+          fail-on-diff: true

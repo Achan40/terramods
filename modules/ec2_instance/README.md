@@ -1,5 +1,8 @@
-<!-- BEGIN_TF_DOCS -->
+# ec2_instance
 Deploy any number of EC2 machines to a vpc. Accessed via EICE or by tailscale once linked.
+
+<!-- BEGIN_TF_DOCS -->
+
 
 ## Requirements
 
