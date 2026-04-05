@@ -23,13 +23,8 @@ func TestGithubOIDCProvider(t *testing.T) {
 	t.Parallel()
 
 	terraformOptions := &terraform.Options{
-		TerraformDir:    "../../infra/test/github_oidc",
+		TerraformDir:    "../../examples/required/github_oidc",
 		TerraformBinary: "terragrunt",
-		Vars: map[string]interface{}{
-			"ci_cd_role_name":   "ci_cd_role_test",
-			"ci_cd_policy_name": "ci_cd_policy_test",
-			"github_repo":       "Achan40/terramods",
-		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)

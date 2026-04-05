@@ -1,7 +1,7 @@
 # terramods
-A space to store my terragrunt modules
+A catalog of terragrunt modules
 
-Usage examples can be found in `infra/test`. Note that if remote_state is included and referenced, the resulting s3 bucket and dynamodb table created will need to be manually torn down as it cannot be tracked by terraform.
+Usage examples can be found in `examples/units`. Note that if remote_state is included and referenced, the resulting s3 bucket and dynamodb table created will need to be manually torn down as it cannot be tracked by terraform.
 
 # Quick Notes
 Testing
@@ -38,3 +38,7 @@ make docs
 ```
 
 The CI pipeline will fail if the README.md is out of date.
+
+# References
+https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example
+https://github.com/gruntwork-io/terragrunt-infrastructure-live-stacks-example

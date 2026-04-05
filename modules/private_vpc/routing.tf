@@ -23,7 +23,7 @@ resource "aws_route_table" "private" {
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat[each.key].id  # explicit lookup by AZ
+    nat_gateway_id = aws_nat_gateway.nat[each.key].id # explicit lookup by AZ
   }
 
   tags = { Name = "${var.vpc_name}-private-rt-${each.key}" }
