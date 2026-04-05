@@ -35,17 +35,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('test/units/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('test/go.sum') }}
           restore-keys: ${{ runner.os }}-go-
 
       - name: Verify Go modules are tidy
         run: |
-          cd test/units/
+          cd test/
           go mod tidy
           git diff --exit-code -- go.mod go.sum
 
       - name: Go vet
-        run: cd test/units && go vet ./...
+        run: cd test && go vet ./...
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
@@ -90,7 +90,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('test/units/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('test/go.sum') }}
           restore-keys: ${{ runner.os }}-go-
 
       - name: Setup Terraform
@@ -105,7 +105,7 @@ jobs:
           tofu_version: '1.11.5'
 
       - name: Install gotestsum
-        run: go install gotest.tools/gotestsum@v1.12.0
+        run: go install gotest.tools/gotestsum@v2.0.0
 
       - name: Clear terragrunt cache
         run: find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
@@ -115,9 +115,9 @@ jobs:
           TERRAGRUNT_LOG_LEVEL: error
           TF_LOG: ERROR
         run: |
-          cd test/units/
+          cd test/
           go mod tidy
-          gotestsum --format testname -- -timeout 30m
+          gotestsum --format testname -- ./units/... -timeout 30m
 
   promote-to-uat:
     needs: run-unit-tests
