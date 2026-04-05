@@ -42,7 +42,7 @@ jobs:
         run: |
           cd test/units/
           go mod tidy
-          git diff --exit-code go.mod go.sum
+          git diff --exit-code -- go.mod go.sum
 
       - name: Go vet
         run: cd test/units && go vet ./...

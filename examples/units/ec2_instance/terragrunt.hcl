@@ -23,7 +23,7 @@ inputs = {
   instance_name = "test-ec2-instance"
   ami_id        = "ami-0c55b159cbfafe1f0"
   instance_type = "t3.micro"
-  instance_count= 2
+  instance_count= 3
 
   # Required: sourced from private_vpc module outputs.
   eice_security_group_id = dependency.vpc.outputs.eice_security_group_id
