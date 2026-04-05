@@ -62,8 +62,8 @@ resource "aws_iam_policy" "ci_cd_policy" {
 
       # EC2 provisioning (instances, networking, SGs, AMIs, etc.)
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "ec2:*",
           "elasticloadbalancing:*",
           "autoscaling:*"
@@ -73,8 +73,8 @@ resource "aws_iam_policy" "ci_cd_policy" {
 
       # IAM role pass-through (needed when attaching IAM roles to EC2/ECS tasks)
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "iam:CreateRole",
           "iam:DeleteRole",
           "iam:TagRole",
@@ -99,8 +99,8 @@ resource "aws_iam_policy" "ci_cd_policy" {
       },
       # DynamoDB state locking
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:DeleteItem",
@@ -110,8 +110,8 @@ resource "aws_iam_policy" "ci_cd_policy" {
       },
       # SSM
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
