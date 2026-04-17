@@ -51,6 +51,13 @@ variable "additional_security_group_ids" {
   default     = []
 }
 
+variable "tailscale_auth_key" {
+  type        = string
+  description = "Tailscale auth key. When provided, installs Tailscale, enables IP forwarding, and advertises the subnet route. If omitted, Tailscale is not installed."
+  default     = null
+  sensitive   = true
+}
+
 variable "tags" {
   type        = map(string)
   description = "Additional tags to apply to all resources"

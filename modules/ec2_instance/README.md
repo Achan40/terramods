@@ -31,6 +31,7 @@ Deploy any number of EC2 machines to a vpc. Accessed via EICE or by tailscale on
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of EC2 instances to deploy. | `number` | `1` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | EC2 instance type | `string` | `"t3.micro"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_tailscale_auth_key"></a> [tailscale\_auth\_key](#input\_tailscale\_auth\_key) | Tailscale auth key. When provided, installs Tailscale, enables IP forwarding, and advertises the subnet route. If omitted, Tailscale is not installed. | `string` | `null` | no |
 
 ## Outputs
 

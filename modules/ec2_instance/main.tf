@@ -46,11 +46,20 @@ resource "aws_instance" "main" {
   vpc_security_group_ids = concat([aws_security_group.instance.id], var.additional_security_group_ids)
   iam_instance_profile   = var.iam_instance_profile_name
 
+  source_dest_check = var.tailscale_auth_key != null ? false : true
+
   user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
     apt-get install -y ec2-instance-connect
+    %{if var.tailscale_auth_key != null}
     curl -fsSL https://tailscale.com/install.sh | sh
+    echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf
+    sysctl -p
+    IFACE=$(ip route | grep default | awk '{print $5}' | head -1)
+    SUBNET=$(ip route | grep "$IFACE" | grep -v default | awk '{print $1}' | head -1)
+    tailscale up --authkey=${var.tailscale_auth_key} --advertise-routes=$SUBNET
+    %{endif}
   EOF
 
   tags = merge(var.tags, { Name = "${var.instance_name}-${count.index + 1}" })

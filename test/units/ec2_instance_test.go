@@ -71,7 +71,7 @@ func TestEC2InstanceCustomVPC(t *testing.T) {
 
 	clusterSGID := terraform.Output(t, sgOptions, "security_group_id")
 
-	// Step 4: deploy EC2 into the VPC
+	// Step 4: deploy EC2 into the VPC (no Tailscale auth key)
 	ec2Options := &terraform.Options{
 		TerraformDir:    "../../examples/units/ec2_instance",
 		TerraformBinary: "terragrunt",
@@ -132,4 +132,94 @@ func TestEC2InstanceCustomVPC(t *testing.T) {
 		sgIDs = append(sgIDs, *sg.GroupId)
 	}
 	assert.Contains(t, sgIDs, clusterSGID)
+
+	// Source/dest check enabled (no Tailscale auth key provided)
+	require.NotNil(t, instance.SourceDestCheck)
+	assert.True(t, *instance.SourceDestCheck)
+}
+
+// TestEC2SubnetRouter deploys an EC2 instance with a Tailscale auth key and
+// validates that source/dest check is disabled at the AWS level.
+func TestEC2SubnetRouter(t *testing.T) {
+
+	uniqueID := random.UniqueId()
+
+	vpcOptions := &terraform.Options{
+		TerraformDir:    "../../examples/units/private_vpc",
+		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"vpc_name":           "test-vpc-" + uniqueID,
+			"region":             "us-east-2",
+			"vpc_cidr":           "10.0.0.0/16",
+			"availability_zones": []string{"us-east-2a"},
+		},
+	}
+
+	defer terraform.Destroy(t, vpcOptions)
+	terraform.InitAndApply(t, vpcOptions)
+
+	vpcID := terraform.Output(t, vpcOptions, "vpc_id")
+	subnetIDs := terraform.OutputList(t, vpcOptions, "private_subnet_ids")
+	eiceSGID := terraform.Output(t, vpcOptions, "eice_security_group_id")
+	region := terraform.Output(t, vpcOptions, "region")
+	require.NotEmpty(t, subnetIDs)
+
+	iamOptions := &terraform.Options{
+		TerraformDir:    "../../examples/units/iam_instance_role",
+		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"region":    region,
+			"role_name": "test-router-" + uniqueID,
+		},
+	}
+
+	defer terraform.Destroy(t, iamOptions)
+	terraform.InitAndApply(t, iamOptions)
+
+	instanceProfileName := terraform.Output(t, iamOptions, "instance_profile_name")
+
+	ec2Options := &terraform.Options{
+		TerraformDir:    "../../examples/units/ec2_instance",
+		TerraformBinary: "terragrunt",
+		Vars: map[string]interface{}{
+			"region":                        region,
+			"instance_name":                 "test-router-" + uniqueID,
+			"ami_id":                        "ami-0900fe555666598a2",
+			"instance_type":                 "t3.micro",
+			"instance_count":                1,
+			"vpc_id":                        vpcID,
+			"subnet_ids":                    subnetIDs,
+			"eice_security_group_id":        eiceSGID,
+			"iam_instance_profile_name":     instanceProfileName,
+			"additional_security_group_ids": []string{},
+			"tailscale_auth_key":            "tskey-test-placeholder",
+		},
+	}
+
+	defer terraform.Destroy(t, ec2Options)
+	terraform.InitAndApply(t, ec2Options)
+
+	instanceIDs := terraform.OutputList(t, ec2Options, "instance_ids")
+	require.Len(t, instanceIDs, 1)
+
+	ctx := context.Background()
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
+	require.NoError(t, err)
+
+	ec2Client := ec2.NewFromConfig(cfg)
+
+	out, err := ec2Client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+		InstanceIds: instanceIDs,
+	})
+	require.NoError(t, err)
+	require.Len(t, out.Reservations, 1)
+	require.Len(t, out.Reservations[0].Instances, 1)
+
+	instance := out.Reservations[0].Instances[0]
+
+	assert.Equal(t, ec2types.InstanceStateNameRunning, instance.State.Name)
+
+	// Source/dest check must be disabled when a Tailscale auth key is provided
+	require.NotNil(t, instance.SourceDestCheck)
+	assert.False(t, *instance.SourceDestCheck)
 }
